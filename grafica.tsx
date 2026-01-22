@@ -1,0 +1,309 @@
+import React, { useState } from 'react';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState('segmento');
+
+  // Datos por segmento
+  const dataSegmento = [
+    { name: 'Enterprise', clientes: 3, agentes: 8350, color: '#2563eb' },
+    { name: 'Mid-Market', clientes: 4, agentes: 365, color: '#7c3aed' },
+    { name: 'Growth', clientes: 4, agentes: 71, color: '#059669' },
+    { name: 'BPO', clientes: 4, agentes: 530, color: '#ea580c' },
+    { name: 'Emerging', clientes: 4, agentes: 26, color: '#dc2626' }
+  ];
+
+  // Datos por industria
+  const dataIndustria = [
+    { name: 'Banca', value: 3, color: '#2563eb' },
+    { name: 'Fintech', value: 3, color: '#7c3aed' },
+    { name: 'Contact Center/BPO', value: 6, color: '#059669' },
+    { name: 'Automotriz', value: 2, color: '#ea580c' },
+    { name: 'Otros', value: 5, color: '#dc2626' }
+  ];
+
+  // Datos por tamaño
+  const dataTamaño = [
+    { name: 'Mega (1000+)', clientes: 2, color: '#2563eb' },
+    { name: 'Grande (500-999)', clientes: 1, color: '#7c3aed' },
+    { name: 'Mediano (100-499)', clientes: 3, color: '#059669' },
+    { name: 'Pequeño (20-99)', clientes: 5, color: '#ea580c' },
+    { name: 'Micro (<20)', clientes: 4, color: '#dc2626' }
+  ];
+
+  // Datos por prioridad
+  const dataPrioridad = [
+    { name: 'Crítica', value: 3, color: '#dc2626' },
+    { name: 'Alta', value: 7, color: '#ea580c' },
+    { name: 'Media', value: 9, color: '#eab308' }
+  ];
+
+  // Datos por dolor principal
+  const dataDolor = [
+    { name: 'QA/Calidad', value: 5, color: '#2563eb' },
+    { name: 'Omnicanalidad', value: 6, color: '#7c3aed' },
+    { name: 'Automatización/IA', value: 4, color: '#059669' },
+    { name: 'Infraestructura', value: 4, color: '#ea580c' }
+  ];
+
+  // Datos por solución
+  const dataSolucion = [
+    { name: 'Omnicanalidad + IA', value: 7, color: '#2563eb' },
+    { name: 'QA + Speech Analytics', value: 4, color: '#7c3aed' },
+    { name: 'Bots/Agentes Virtuales', value: 4, color: '#059669' },
+    { name: 'Plataforma Cloud', value: 4, color: '#ea580c' }
+  ];
+
+  // Datos por potencial
+  const dataPotencial = [
+    { name: 'Alto', value: 10, color: '#059669' },
+    { name: 'Medio', value: 9, color: '#eab308' },
+    { name: 'Bajo', value: 0, color: '#dc2626' }
+  ];
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-300 rounded shadow-lg">
+          <p className="font-semibold">{payload[0].payload.name}</p>
+          {payload[0].payload.clientes && (
+            <p className="text-sm">Clientes: {payload[0].payload.clientes}</p>
+          )}
+          {payload[0].payload.agentes && (
+            <p className="text-sm">Agentes: {payload[0].payload.agentes.toLocaleString()}</p>
+          )}
+          {payload[0].payload.value && (
+            <p className="text-sm">Total: {payload[0].payload.value}</p>
+          )}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const renderPieChart = (data, title) => (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">{title}</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+            outerRadius={80}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip content={<CustomTooltip />} />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard de Segmentación 2025</h1>
+        <p className="text-gray-600 mb-6">19 Clientes | 9,342 Agentes Totales</p>
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6 overflow-x-auto">
+          {['segmento', 'industria', 'tamaño', 'prioridad', 'dolor', 'solucion', 'potencial'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap ${
+                activeTab === tab
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Gráficas */}
+        {activeTab === 'segmento' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">Clientes por Segmento</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={dataSegmento}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="clientes" fill="#2563eb" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">Agentes por Segmento</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={dataSegmento}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="agentes" fill="#7c3aed" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Insight Card */}
+            <div className="lg:col-span-2 bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg">
+              <h4 className="font-semibold text-blue-900 mb-2">📊 Insight Clave</h4>
+              <p className="text-blue-800">
+                El 88% de los agentes (8,350) están concentrados en solo 3 clientes Enterprise. 
+                Esto representa una oportunidad de expansión en los segmentos Mid-Market y Growth con mayor margen.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'industria' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {renderPieChart(dataIndustria, 'Distribución por Industria')}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Detalles por Industria</h3>
+              <div className="space-y-3">
+                {dataIndustria.map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 rounded" style={{backgroundColor: item.color}}></div>
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    <span className="text-gray-600">{item.value} clientes</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'tamaño' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {renderPieChart(dataTamaño, 'Distribución por Tamaño')}
+            <div className="bg-orange-50 border-l-4 border-orange-600 p-6 rounded-lg">
+              <h4 className="font-semibold text-orange-900 mb-2">🎯 Estrategia Recomendada</h4>
+              <ul className="text-orange-800 space-y-2">
+                <li>• <strong>Mega/Grande:</strong> Enfoque en retención y upselling</li>
+                <li>• <strong>Mediano:</strong> Mayor potencial de crecimiento</li>
+                <li>• <strong>Pequeño/Micro:</strong> Automatización rápida con IA</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'prioridad' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {renderPieChart(dataPrioridad, 'Prioridad de Negocio')}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Plan de Acción</h3>
+              <div className="space-y-4">
+                <div className="border-l-4 border-red-500 pl-4">
+                  <p className="font-semibold text-red-700">Crítica (3 clientes)</p>
+                  <p className="text-sm text-gray-600">Atención inmediata - Alto volumen de agentes</p>
+                </div>
+                <div className="border-l-4 border-orange-500 pl-4">
+                  <p className="font-semibold text-orange-700">Alta (7 clientes)</p>
+                  <p className="text-sm text-gray-600">Implementación Q1-Q2 2025</p>
+                </div>
+                <div className="border-l-4 border-yellow-500 pl-4">
+                  <p className="font-semibold text-yellow-700">Media (9 clientes)</p>
+                  <p className="text-sm text-gray-600">Pipeline Q3-Q4 2025</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'dolor' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {renderPieChart(dataDolor, 'Dolores Principales')}
+            <div className="bg-purple-50 border-l-4 border-purple-600 p-6 rounded-lg">
+              <h4 className="font-semibold text-purple-900 mb-2">💡 Oportunidades Cross-Sell</h4>
+              <p className="text-purple-800 mb-3">
+                Los clientes con dolor de <strong>Omnicanalidad</strong> (6 clientes) son candidatos naturales 
+                para soluciones de <strong>QA + Speech Analytics</strong>.
+              </p>
+              <p className="text-purple-800">
+                Ruta recomendada: Omnicanalidad → QA → Automatización/IA
+              </p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'solucion' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {renderPieChart(dataSolucion, 'Soluciones Clave')}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Portafolio de Soluciones</h3>
+              <div className="space-y-3">
+                <div className="p-3 bg-blue-50 rounded">
+                  <p className="font-semibold text-blue-900">Omnicanalidad + IA (7)</p>
+                  <p className="text-sm text-blue-700">Mayor demanda - Solución flagship</p>
+                </div>
+                <div className="p-3 bg-purple-50 rounded">
+                  <p className="font-semibold text-purple-900">QA + Speech Analytics (4)</p>
+                  <p className="text-sm text-purple-700">Alto valor - Diferenciador competitivo</p>
+                </div>
+                <div className="p-3 bg-green-50 rounded">
+                  <p className="font-semibold text-green-900">Bots/Agentes Virtuales (4)</p>
+                  <p className="text-sm text-green-700">Innovación - ROI rápido</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'potencial' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {renderPieChart(dataPotencial, 'Potencial de Crecimiento')}
+            <div className="bg-green-50 border-l-4 border-green-600 p-6 rounded-lg">
+              <h4 className="font-semibold text-green-900 mb-2">🚀 Conclusión Estratégica</h4>
+              <p className="text-green-800 mb-3">
+                <strong>10 clientes (53%)</strong> con potencial ALTO de crecimiento representan 
+                la mejor oportunidad de expansión para 2025.
+              </p>
+              <p className="text-green-800">
+                Ningún cliente tiene potencial bajo, lo que indica una cartera saludable 
+                y con alta probabilidad de éxito.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Footer con métricas totales */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white p-4 rounded-lg shadow text-center">
+            <p className="text-gray-600 text-sm">Total Clientes</p>
+            <p className="text-3xl font-bold text-blue-600">19</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow text-center">
+            <p className="text-gray-600 text-sm">Total Agentes</p>
+            <p className="text-3xl font-bold text-purple-600">9,342</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow text-center">
+            <p className="text-gray-600 text-sm">Potencial Alto</p>
+            <p className="text-3xl font-bold text-green-600">10</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow text-center">
+            <p className="text-gray-600 text-sm">Prioridad Crítica/Alta</p>
+            <p className="text-3xl font-bold text-orange-600">10</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
